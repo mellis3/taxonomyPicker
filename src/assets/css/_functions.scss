@@ -1,0 +1,288 @@
+
+//for z-index layering
+@function layer($layer-name) {
+    @return map-get($layers, $layer-name);
+}
+
+//for colors
+@function color($color-name) {
+    @return map-get($colors, $color-name);
+}
+
+//for font sizes
+@function fontSize($size) {
+    @return map-get($fontSize, $size);
+}
+
+//for font sizes
+@function fontWeight($weight) {
+    @return map-get($fontWeight, $weight);
+}
+
+//for transition times
+@function time($timeName) {
+    @return map-get($times, $timeName);
+}
+
+//for easing
+@function easing($easingName) {
+    @return map-get($easing, $easingName);
+}
+
+//for media queries
+@mixin smaller($width) {
+  @media (max-width: $width) {
+    @content;
+  }
+}
+@mixin larger($width) {
+  @media (min-width: $width + 1) {
+    @content;
+  }
+}
+@mixin between($widthSmall, $widthLarge){
+    @media (min-width: $widthSmall + 1) and  (max-width: $widthLarge){
+      @content;
+    }
+}
+//ratio based query
+//allow a range so that ratio doesn't have to be a perfect integer
+@mixin ratio($ratioW, $ratioH, $width: null){
+    $w: (($ratioW * 100) - 3);
+    $h: ($ratioH * 100);
+    @if ($width != null) {
+        @media (min-aspect-ratio: #{$w} / #{$h}) and (max-width: $width) {
+            @content;
+        }
+    }
+    @else {
+        @media (min-aspect-ratio: #{$w} / #{$h}){
+            @content;
+        }
+    }
+}
+
+
+//object fit
+@mixin objectFit($value){
+    object-fit: $value;
+    font-family: 'object-fit: #{$value};'
+}
+
+//for animations
+@mixin keyframe-gen($name) {
+  @keyframes #{$name} {
+    @each $position, $change in map-get($animations, $name) {
+      #{$position} {
+        @each $prop, $val in $change {
+          #{$prop}: #{$val};
+        }
+      }
+    }
+  }
+};
+$included-animations: ();
+@mixin animate($name, $duration: 0.5s, $iterations: 1, $timing: ease-in-out, $delay: 0s) {
+  $exists: index($included-animations, '#{$name}');
+  @if not $exists {
+    @at-root {
+      @include keyframe-gen($name);
+    }
+    $included-animations: append($included-animations, '#{$name}') !global;
+  }
+
+  animation: $name $duration $iterations $timing $delay;
+};
+
+//horizontally and vertically center item within parent
+@mixin centerBoth {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform:translate(-50%, -50%);
+}
+
+//horizontally center item within parent
+@mixin centerHorz {
+    position: absolute;
+    left: 50%;
+    transform:translateX(-50%);
+}
+
+//clearfix
+%clearfix {
+    &:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+//create circle
+@mixin circle($size){
+    width:$size;
+    height:$size;
+    border-radius:$size / 2;
+}
+
+//create triangle
+@mixin triangle ($direction: right, $size: 0.75em, $color: inherit) {
+    display: inline-block;
+    height: 0;
+    width: 0;
+    // For improved appearance in some Webkit browsers
+    -webkit-transform: rotate(360deg);
+
+    // Set up some variables
+    $width: null;
+    $height: null;
+    $border-widths: null;
+
+    @if type-of($size) == list {
+    $width: nth($size, 1);
+    $height: nth($size, 2);
+    }
+    @else {
+    $width: $size;
+    $height: $size;
+    }
+
+    @if ($direction == up) or ($direction == down) {
+    // For up and down, width gets two borders but height only one,
+    // so divide second border-width value by 2
+    $border-widths: $height ($width / 2);
+    }
+    @else if ($direction == right) or ($direction == left) {
+    // For right and left, height gets two borders but width only one,
+    // so divide first border-width value by 2
+    $border-widths: ($height / 2) $width;
+    }
+    @else {
+    // For right triangles (the rest), both sides get two borders,
+    // so divide both by 2
+    $border-widths: ($height / 2) ($width / 2);
+    }
+
+    border-width: $border-widths;
+    border-style: solid;
+
+
+    // STANDARD TRIANGLES
+
+    @if ($direction == up) or ($direction == down) or ($direction == right) or ($direction == left) {
+    border-color: transparent;
+    @if $direction == up {
+      border-bottom-color: $color;
+      border-top-width: 0;
+    }
+    @else if $direction == right {
+      border-left-color: $color;
+      border-right-width: 0;
+    }
+    @else if $direction == down {
+      border-top-color: $color;
+      border-bottom-width: 0;
+    }
+    @else if $direction == left {
+      border-right-color: $color;
+      border-left-width: 0;
+    }
+    }
+
+
+    // CORNER TRIANGLES
+
+    @else if ($direction == top-right) or ($direction == top-left) {
+    border-top-color: $color;
+    border-bottom-color: transparent;
+    @if $direction == top-right {
+      border-left-color: transparent;
+      border-right-color: $color;
+    }
+    @else if $direction == top-left {
+      border-left-color: $color;
+      border-right-color: transparent;
+    }
+    }
+
+    @else if ($direction == bottom-right) or ($direction == bottom-left) {
+    border-top-color: transparent;
+    border-bottom-color: $color;
+    @if $direction == bottom-right {
+      border-left-color: transparent;
+      border-right-color: $color;
+    }
+    @else if $direction == bottom-left {
+      border-left-color: $color;
+      border-right-color: transparent;
+    }
+    }
+}
+
+//arrows
+@mixin arrow ($direction: down, $width: 0.75rem, $weight: 1px, $color: white) {
+    content:'';
+    position:absolute;
+    width: $width;
+    height: $width;
+    border-top:solid $weight $color;
+    border-right: solid $weight $color;
+    @if ($direction == up){
+        transform:rotate(-45deg);
+    }
+    @else if ($direction == right) {
+        transform:rotate(45deg);
+    }
+    @else if ($direction == down) {
+        transform:rotate(135deg);
+    }
+    @else if ($direction == left) {
+        transform:rotate(-135deg);
+    }
+}
+
+//for responsive background images
+$imgPath: '../img/';
+$largeExt: '_large.jpg';
+$mediumExt: '_medium.jpg';
+$smallRetinaExt: '_smallRetina.jpg';
+$smallExt: '_small.jpg';
+@mixin responsiveBackground($imageURL){
+    //large and retina above 600
+    @media (min-width:$large),
+           (-webkit-min-device-pixel-ratio: 2) and (min-width:$small),
+           (min-resolution: 192dpi) and (min-width:$small){
+               background-image:url(#{$imgPath}#{$imageURL}#{$largeExt});
+    }
+    //non-retina between 600 and 1200
+    @media (min-width:$small) and (max-width:$large) and (-webkit-max-device-pixel-ratio: 1),
+           (min-width:$small) and (max-width:$large) and (max-resolution: 100dpi){
+               background-image:url(#{$imgPath}#{$imageURL}#{$mediumExt});
+    }
+    //retina between 320 and 600
+    @media (-webkit-min-device-pixel-ratio: 2) and (min-width:$micro) and (max-width:$small),
+           (min-resolution: 192dpi) and (min-width:$micro) and (max-width:$small){
+               background-image:url(#{$imgPath}#{$imageURL}#{$smallRetinaExt});
+    }
+    //non retina smaller than 600
+    @media (max-width:$small) and (-webkit-max-device-pixel-ratio: 1),
+           (max-width:$small) and (max-resolution: 100dpi){
+        background-image:url(#{$imgPath}#{$imageURL}#{$smallExt});
+    }
+    //retina smaller than 320
+    @media (-webkit-min-device-pixel-ratio: 2) and (max-width:$micro),
+           (min-resolution: 192dpi) and (max-width:$micro){
+               background-image:url(#{$imgPath}#{$imageURL}#{$smallExt});
+    }
+}
+
+
+//loop
+@mixin loop($list){
+    @each $item, $value in $list{
+        .#{$item}{
+            #{$item}: $value;
+        }
+    }
+
+}

@@ -1,0 +1,229 @@
+.button{
+    display: inline-block;
+    position: relative;
+    font-size: 0.825em;
+    //overflow: hidden;
+    cursor: pointer;
+    &:before{
+        content:"";
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: scale(0.7);
+        transform-origin: center center;
+        background: rgba( $dark, 0.2 );
+        opacity: 0;
+        transition: transform $time_hover, opacity 0.25s;
+    }
+    &:hover, &.active, &[data-subtype="checkbox"]{
+        &:before{
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+    &.active{
+        &.color-primary{
+            &:before{
+                background: $color-primary;
+            }
+            .button-inner{
+                color: white;
+                font-weight: bold;
+            }
+        }
+    }
+    &-inner{
+        position: relative;
+        font-size: 1em;
+        text-align: center;
+        z-index: 1000;
+        transition: color $time_hover;
+
+        .arrow{
+            display: inline-block;
+            &:before{
+                transition: border-color $time_hover;
+            }
+            &.left{
+                &:before{
+                    transform: rotate( -135deg );
+                }
+            }
+            &.right{
+                &:before{
+                    transform: rotate( 45deg );
+                }
+            }
+        }
+    }
+
+    //primary buttons
+    //larger, square
+    &[data-type="primary"]{
+        font-weight: bold;
+        color: $dark;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+
+        &:before{
+            border-radius: 3px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .button-inner{
+            padding: 0.75em 1.75em 0.7em;
+        }
+
+        //subtype
+        &[data-subtype="primary"]{
+            background: #E6E6E6;
+            border-radius: 3px;
+        }
+    }
+
+
+    //secondary buttons
+    //rounded, smaller
+    &[data-type="secondary"], &[data-type="tertiary"]{
+        border: solid 1px $lightGray;
+        border-radius: 3px;
+        color: $mediumGray;
+        &:before{
+            top: -1px;
+            left: -1px;
+            border-radius: 3px;
+            width: calc( 100% + 2px );
+            height: calc( 100% + 2px );
+        }
+        &:hover, &[state='active']{
+            color: $dark;
+            .arrow:before{
+                border-color: rgba( $dark, 0.5 );
+            }
+        }
+
+        .button-inner{
+            padding: 0.3em 1em 0.25em;
+            .arrow{
+                transform: translateY( -0.1em );
+            }
+        }
+    }
+
+    &[data-type="tertiary"]{
+        font-size: 0.75em;
+    }
+
+    &[data-type="close"]{
+        font-size: 24px;
+        line-height: 0.7em;
+        color: $mediumGray;
+
+        &:before{
+            top: 50%;
+            left: 50%;
+            width: 1em;
+            height: 1em;
+            border-radius: 50%;
+            transform: scale(0) translate(-50%, -50%);
+            transform-origin: top left;
+        }
+
+        .button-inner{
+            transform: rotate( 45deg );
+        }
+
+        &:hover{
+            &:before{
+                transform: scale(1) translate(-50%, -50%);
+            }
+        }
+    }
+
+    &[data-subtype="rounded"]{
+        border-radius: 10em;
+        &:before{
+            border-radius: 10em;
+        }
+    }
+
+    //checkbox or checkmark
+    $checkboxSize: 2.6em;
+    &[data-subtype="checkbox"], &[data-subtype="checkmark"]{
+        &:after{
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: $checkboxSize / 2;
+            width: $checkboxSize / 4;
+            height: $checkboxSize / 1.75;
+            border-right: solid 2px white;
+            border-bottom: solid 2px white;
+            transform: translate( -50%, -65% ) rotate( 45deg );
+
+        }
+    }
+
+    //turn into button with checkbox
+    &[data-subtype="checkbox"]{
+        padding-left: $checkboxSize / 1.2;
+        &:before{
+            content:"";
+            position: absolute;
+            top:-1px;
+            left:-1px;
+            width: calc( #{ $checkboxSize } + 2px );
+            height: calc( #{ $checkboxSize } + 2px );
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            background: $lightGray;
+            border: none;
+            border-right: inherit;
+            transition: background $time_hover;
+        }
+        &:after{
+            transform: translate( -50%, -65% ) rotate( 45deg ) scale(0.7);
+            opacity: 0.5;
+            transition: transform $time_hover, opacity $time_hover;
+        }
+
+        &.active{
+            &:before{
+                background: $color-primary;
+            }
+            &:after{
+                transform: translate( -50%, -65% ) rotate( 45deg );
+                opacity: 0.8;
+            }
+        }
+    }
+
+    //turn button into a checkmark
+    &[data-subtype="checkmark"]{
+        background: $lightGray;
+        border-radius: 50%;
+        width: $checkboxSize;
+        height: $checkboxSize;
+        opacity: 0.5;
+        transition: opacity $time_hover, background $time_hover;
+
+        &:before{
+            display: none;
+        }
+        &:after{
+            transform: translate( -50%, -65% ) rotate( 45deg );
+        }
+
+        .button-inner{
+            font-size: 0;
+        }
+
+    }
+
+
+    //consecutive buttons
+    & + &{
+        margin-left: 0.5em;
+    }
+}
